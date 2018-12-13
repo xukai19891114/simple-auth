@@ -1,0 +1,59 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+		http://www.springframework.org/schema/beans/spring-beans-3.2.xsd 
+		http://www.springframework.org/schema/mvc 
+		http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd 
+		http://www.springframework.org/schema/context 
+		http://www.springframework.org/schema/context/spring-context-3.2.xsd 
+		http://www.springframework.org/schema/aop 
+		http://www.springframework.org/schema/aop/spring-aop-3.2.xsd 
+		http://www.springframework.org/schema/tx 
+		http://www.springframework.org/schema/tx/spring-tx-3.2.xsd 
+		http://www.springframework.org/schema/util 
+		http://www.springframework.org/schema/util/spring-util.xsd">
+
+    <!-- Shiro的Web过滤器 -->
+    <bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
+        <!-- Shiro的安全管理器，所有关于安全的操作都会经过SecurityManager -->
+        <property name="securityManager" ref="securityManager"/>
+        <!-- loginUrl认证提交地址，如果没有认证将会请求此地址进行认证，请求此地址将由formAuthenticationFilter进行表单认证 -->
+        <property name="loginUrl" value="/login.jsp"/>
+        <!-- 权限验证失败跳转的页面，需要配合Spring的ExceptionHandler异常处理机制使用 -->
+        <property name="unauthorizedUrl" value="/unauthorized.jsp"/>
+        <!-- 自定义的过滤器链，从上向下执行，一般将`/**`放到最下面 -->
+        <property name="filterChainDefinitions">
+            <value>
+                <!-- 静态资源不拦截 -->
+                <!--/**=anon 表示所有的url都可以匿名访问，anon是shiro中一个过滤器的简写，关于shiro中的过滤器介绍见-->
+                /static/** = anon
+                /lib/** = anon
+                /js/** = anon
+                /css/** = anon
+
+                <!-- 登录页面不拦截 -->
+                /login.jsp = anon
+                /sys/user/login = anon
+
+                <!-- Shiro提供了退出登录的配置`logout`，会生成路径为`/logout`的请求地址，访问这个地址即会退出当前账户并清空缓存 -->
+                /logout = logout
+
+                <!-- user表示身份通过或通过记住我通过的用户都能访问系统 -->
+                /hello.html = user
+				<!-- -/**=authc 表示所有的url都必须认证通过才可以访问- -->
+                <!-- `/**`表示所有请求，表示访问该地址的用户是身份验证通过或RememberMe登录的都可以 -->
+                /** = user
+            </value>
+        </property>
+    </bean>
+
+    <!-- 安全管理器 -->
+    <bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
+        <property name="realm" ref="userRealm"/>
+    </bean>
+
+    <!-- Realm实现 -->
+    <bean id="userRealm" class="com.xuxu.shiro.UserRealm"></bean>
+</beans>
