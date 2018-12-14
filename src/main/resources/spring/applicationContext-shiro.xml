@@ -41,10 +41,10 @@
                 /logout = logout
 
                 <!-- user表示身份通过或通过记住我通过的用户都能访问系统 -->
-                /hello.html = user
+                /hello.html = anon
 				<!-- -/**=authc 表示所有的url都必须认证通过才可以访问- -->
                 <!-- `/**`表示所有请求，表示访问该地址的用户是身份验证通过或RememberMe登录的都可以 -->
-                /** = user
+                /** = anon
             </value>
         </property>
     </bean>
